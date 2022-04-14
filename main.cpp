@@ -1,4 +1,5 @@
-
+#include <cuda_runtime.h>
+#include <cuda.h>
 #include <cmath>
 
 // define the domain size and the halo width
@@ -14,13 +15,37 @@ typedef MemRef1D MemRefType1D;
 typedef MemRef2D MemRefType2D;
 typedef MemRef3D MemRefType3D;
 
-extern "C"
+#define CUDA_CALL_SAFE(f) \
+	    do \
+    {                                                        \
+	            cudaError_t _cuda_error = f;                         \
+	            if (_cuda_error != cudaSuccess)                      \
+	            {                                                    \
+			                fprintf(stderr,  \
+							                "%s, %d, CUDA ERROR: %s %s\n",  \
+									                __FILE__,   \
+											                __LINE__,   \
+													                cudaGetErrorName(_cuda_error),  \
+															                cudaGetErrorString(_cuda_error) \
+																	            ); \
+			                abort(); \
+			                return EXIT_FAILURE; \
+			            } \
+	        } while (0)        
+
+extern "C" 
 {
-	extern void _mlir_ciface_laplace(MemRefType3D *input, MemRefType3D *output);
+ void _mlir_ciface_laplace(MemRefType3D *input, MemRefType3D *output);
 }
+
+CUcontext cuContext;
+CUdevice cuDevice;
+CUmodule cuModule;
+//double in[72][72][72],out[72][72][72];
 
 // program times the execution of the linked program and times the result
 int main(int argc, char **argv) {
+
 
     if(argc == 3) {
         domain_size = atoi(argv[1]);
@@ -30,7 +55,11 @@ int main(int argc, char **argv) {
         std::cout << "Either provide the domain size and domain height like this \"./kernel 128 60\" or do not provide any arguments at all in which case the program is ran with domain size 64 and domain heigh 60" << std::endl;
         exit(1);
     }
+    cuInit(0);
+    cuDeviceGet(&cuDevice, 0);
+    cuCtxCreate(&cuContext, 0, cuDevice);
 
+    // cudaFree(nullptr);
     const std::array<int64_t, 3> sizes3D = { domain_size + 2 * halo_width,
                                              domain_size + 2 * halo_width,
                                              domain_height + 2 * halo_width };
@@ -43,7 +72,7 @@ int main(int argc, char **argv) {
     initValue(out, 0.0, domain_size, domain_height);
 
     // computing the reference version
-    _mlir_ciface_laplace(&in, &out);
+     _mlir_ciface_laplace(&in, &out);
 
     // free the storage
     freeMemRef(in);

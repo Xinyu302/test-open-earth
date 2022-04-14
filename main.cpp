@@ -15,24 +15,6 @@ typedef MemRef1D MemRefType1D;
 typedef MemRef2D MemRefType2D;
 typedef MemRef3D MemRefType3D;
 
-#define CUDA_CALL_SAFE(f) \
-	    do \
-    {                                                        \
-	            cudaError_t _cuda_error = f;                         \
-	            if (_cuda_error != cudaSuccess)                      \
-	            {                                                    \
-			                fprintf(stderr,  \
-							                "%s, %d, CUDA ERROR: %s %s\n",  \
-									                __FILE__,   \
-											                __LINE__,   \
-													                cudaGetErrorName(_cuda_error),  \
-															                cudaGetErrorString(_cuda_error) \
-																	            ); \
-			                abort(); \
-			                return EXIT_FAILURE; \
-			            } \
-	        } while (0)        
-
 extern "C" 
 {
  void _mlir_ciface_laplace(MemRefType3D *input, MemRefType3D *output);

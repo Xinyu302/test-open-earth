@@ -11,26 +11,7 @@
 #define EARTH_RADIUS ((ElementType)6371.229e3) // radius of the earth
 #define EARTH_RADIUS_RECIP ((ElementType)1.0 / EARTH_RADIUS)
 
-#define CUDA_CALL_SAFE(f) \
-	    do \
-	        {                                                        \
-			        cudaError_t _cuda_error = f;                         \
-			        if (_cuda_error != cudaSuccess)                      \
-			        {                                                    \
-					            fprintf(stderr,  \
-								                    "%s, %d, CUDA ERROR: %s %s\n",  \
-										                    __FILE__,   \
-												                    __LINE__,   \
-														                    cudaGetErrorName(_cuda_error),  \
-																                    cudaGetErrorString(_cuda_error) \
-																		                ); \
-					            abort(); \
-					            return EXIT_FAILURE; \
-					        } \
-			    } while (0)       
 const ElementType pi(std::acos(-1.0));
-
-
 
 template <typename ElementType, size_t Rank>
 struct MemRef {
@@ -104,7 +85,9 @@ MemRef1D allocateMemRef(const int64_t size) {
     // initialize the strides
     result.strides[0] = 1;
     result.offset = halo_width * result.strides[0];
-    result.allocatedPtr = new ElementType[size + (32 - halo_width)];
+    if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * (allocSize + (32 - halo_width))) != cudaSuccess) {
+        std::cout << "utils allocateMemRef error" << std::endl;
+    }
     result.alignedPtr = &result.allocatedPtr[(32 - halo_width)];
     return result;
 }
@@ -120,7 +103,9 @@ MemRef2D allocateMemRef(const std::array<int64_t, 2> sizes) {
     result.offset = halo_width * result.strides[0] +
                     halo_width * result.strides[1];
     const int64_t allocSize = sizes[0] * sizes[1];
-    result.allocatedPtr = new ElementType[allocSize + (32 - halo_width)];
+    if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * (allocSize + (32 - halo_width))) != cudaSuccess) {
+        std::cout << "utils allocateMemRef error" << std::endl;
+    }
     result.alignedPtr = &result.allocatedPtr[(32 - halo_width)];
     return result;
 }
@@ -139,9 +124,8 @@ MemRef3D allocateMemRef(const std::array<int64_t, 3> sizes) {
                     halo_width * result.strides[1] +
                     halo_width * result.strides[2];
     const int64_t allocSize = sizes[0] * sizes[1] * sizes[2];
-    if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * allocSize) != cudaSuccess) {
-
-         std::cout << "utils error1" << std::endl;
+    if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * (allocSize + (32 - halo_width))) != cudaSuccess) {
+        std::cout << "utils allocateMemRef error" << std::endl;
     }
     // result.allocatedPtr = new ElementType[allocSize + (32 - halo_width)];
     result.alignedPtr = &result.allocatedPtr[(32 - halo_width)];
@@ -150,7 +134,7 @@ MemRef3D allocateMemRef(const std::array<int64_t, 3> sizes) {
 
 template <typename MemRef>
 void freeMemRef(MemRef &ref) {
-    // delete ref.allocatedPtr;
+    cudaFree(ref.allocatedPtr);
     ref.allocatedPtr = nullptr;
     ref.alignedPtr = nullptr;
 }

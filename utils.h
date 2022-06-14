@@ -91,7 +91,7 @@ MemRef1D allocateMemRef(const int64_t size) {
     result.strides[0] = 1;
     result.offset = halo_width * result.strides[0];
     const int64_t allocSize = size;
-    result.memcpy_size = sizeof(ElementType) * (allocSize + (32 - halo_width));
+    result.memcpy_size = allocSize + (32 - halo_width);
     if (cudaMalloc(&result.allocatedPtrDevice, sizeof(ElementType) * (allocSize + (32 - halo_width) )) != cudaSuccess) {
         std::cout << "allocateMemRef error with cudaMalloc" << std::endl;
     }
@@ -112,7 +112,7 @@ MemRef2D allocateMemRef(const std::array<int64_t, 2> sizes) {
     result.offset = halo_width * result.strides[0] +
                     halo_width * result.strides[1];
     const int64_t allocSize = sizes[0] * sizes[1];
-    result.memcpy_size = sizeof(ElementType) * (allocSize + (32 - halo_width));
+    result.memcpy_size = allocSize + (32 - halo_width);
 
     if (cudaMalloc(&result.allocatedPtrDevice, sizeof(ElementType) * (allocSize + (32 - halo_width) )) != cudaSuccess)  {
         std::cout << "allocateMemRef error with cudaMalloc" << std::endl;
@@ -137,7 +137,7 @@ MemRef3D allocateMemRef(const std::array<int64_t, 3> sizes) {
                     halo_width * result.strides[1] +
                     halo_width * result.strides[2];
     const int64_t allocSize = sizes[0] * sizes[1] * sizes[2];
-    result.memcpy_size = sizeof(ElementType) * (allocSize + (32 - halo_width));
+    result.memcpy_size =  allocSize + (32 - halo_width);
 
     if (cudaMalloc(&result.allocatedPtrDevice, sizeof(ElementType) * (allocSize + (32 - halo_width) )) != cudaSuccess) {
         std::cout << "allocateMemRef error with cudaMalloc" << std::endl;
@@ -159,12 +159,12 @@ void freeMemRef(MemRef &ref) {
 
 template <typename MemRef>
 void MemRefCopyH2D(MemRef &ref) {
-    cudaMemcpy(ref.allocatedPtr,ref.allocatedPtrDevice, ref.memcpy_size, cudaMemcpyHostToDevice);
+    cudaMemcpy(ref.allocatedPtr,ref.allocatedPtrDevice, ref.memcpy_size * sizeof(ElementType), cudaMemcpyHostToDevice);
 }
 
 template <typename MemRef>
 void MemRefCopyD2H(MemRef &ref) {
-    cudaMemcpy(ref.allocatedPtrDevice,ref.allocatedPtr, ref.memcpy_size, cudaMemcpyDeviceToHost);
+    cudaMemcpy(ref.allocatedPtrDevice,ref.allocatedPtr, ref.memcpy_size * sizeof(ElementType), cudaMemcpyDeviceToHost);
 }
 
 template <typename MemRef>
@@ -178,6 +178,8 @@ bool check_difference(MemRef &ref1, MemRef &ref2) {
     for (int i = 0; i < size1; i++) {
         if (ref1.allocatedPtr[i] != ref2.allocatedPtr[i] ) {
             std::cout << "value different at " << i << std::endl;
+            std::cout << "value1 = " << ref1.allocatedPtr[i] << std::endl;
+            std::cout << "value2 = " << ref2.allocatedPtr[i] << std::endl
             return false;
         }
     }

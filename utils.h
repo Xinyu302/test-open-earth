@@ -139,7 +139,7 @@ MemRef3D allocateMemRef(const std::array<int64_t, 3> sizes) {
     const int64_t allocSize = sizes[0] * sizes[1] * sizes[2];
     result.memcpy_size = sizeof(ElementType) * (allocSize + (32 - halo_width));
 
-    if (cudaMalloc(&result.allocatedPtrDevice, sizeof(ElementType) * (allocSize + (32 - halo_width) ))) != cudaSuccess) {
+    if (cudaMalloc(&result.allocatedPtrDevice, sizeof(ElementType) * (allocSize + (32 - halo_width) )) != cudaSuccess) {
         std::cout << "allocateMemRef error with cudaMalloc" << std::endl;
     }
     result.allocatedPtr = new ElementType[allocSize + (32 - halo_width)];

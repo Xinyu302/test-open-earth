@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
     laplace(in, out_cpu);
 
     cudaEvent_t start, stop;
+    float et;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start,0);

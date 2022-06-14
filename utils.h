@@ -90,7 +90,7 @@ MemRef1D allocateMemRef(const int64_t size) {
     // initialize the strides
     result.strides[0] = 1;
     result.offset = halo_width * result.strides[0];
-    const int64_t allocSize = sizes[0];
+    const int64_t allocSize = size;
     result.memcpy_size = sizeof(ElementType) * (allocSize + (32 - halo_width);
     if (cudaMalloc(&result.allocatedPtrDevice, sizeof(ElementType) * (allocSize + (32 - halo_width) )) != cudaSuccess) {
         std::cout << "allocateMemRef error with cudaMalloc" << std::endl;
@@ -177,7 +177,7 @@ bool check_difference(MemRef &ref1, MemRef &ref2) {
     }
     for (int i = 0; i < size1; i++) {
         if (ref1.allocatedPtr[i] != ref2.allocatedPtr[i] ) {
-            cout << "value different at " + i << std::endl;
+            std::cout << "value different at " + i << std::endl;
             return false;
         }
     }

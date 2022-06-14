@@ -1,6 +1,7 @@
 #include <cuda_runtime.h>
 #include <cuda.h>
 #include <cmath>
+#include <cstdio>
 
 // define the domain size and the halo width
 int64_t domain_size = 64;
@@ -9,7 +10,8 @@ int64_t halo_width = 4;
 
 typedef double ElementType;
 
-#include "util.h"
+#include "utils.h"
+#include "laplace.h"
 
 typedef MemRef1D MemRefType1D;
 typedef MemRef2D MemRefType2D;
@@ -41,6 +43,7 @@ int main(int argc, char **argv) {
     cuDeviceGet(&cuDevice, 0);
     cuCtxCreate(&cuContext, 0, cuDevice);
 
+
     // cudaFree(nullptr);
     const std::array<int64_t, 3> sizes3D = { domain_size + 2 * halo_width,
                                              domain_size + 2 * halo_width,
@@ -49,12 +52,30 @@ int main(int argc, char **argv) {
 
     // allocate the storage
     MemRefType3D in = allocateMemRef(sizes3D);
+    MemRefType3D out_cpu = allocateMemRef(sizes3D);
     MemRefType3D out = allocateMemRef(sizes3D);
+
     fillMath(1.1, 2.0, 1.5, 2.8, 2.0, 4.1, in, domain_size, domain_height);
     initValue(out, 0.0, domain_size, domain_height);
+    initValue(out_cpu, 0.0, domain_size, domain_height);
+    
+    MemRefCopyH2D(in);
+    laplace(in, out_cpu);
 
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start,0);
     // computing the reference version
      _mlir_ciface_laplace(&in, &out);
+
+    cudaEventRecord(stop,0);
+    cudaEventSynchronize(stop);
+  
+    cudaEventElapsedTime(&et, start, stop);
+    MemRefCopyD2H(out);
+    check_difference(out, out_cpu);
+    printf("GPU time = %f ms\n", et);
 
     // free the storage
     freeMemRef(in);

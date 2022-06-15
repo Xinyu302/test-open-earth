@@ -85,6 +85,7 @@ MemRef1D allocateMemRef(const int64_t size) {
     // initialize the strides
     result.strides[0] = 1;
     result.offset = halo_width * result.strides[0];
+    const int64_t allocSize = size;
     if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * (allocSize + (32 - halo_width))) != cudaSuccess) {
         std::cout << "utils allocateMemRef error" << std::endl;
     }

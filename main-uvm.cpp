@@ -3,9 +3,9 @@
 #include <cmath>
 
 // define the domain size and the halo width
-int64_t domain_size = 64;
-int64_t domain_height = 60;
-int64_t halo_width = 4;
+int32_t domain_size = 64;
+int32_t domain_height = 60;
+int32_t halo_width = 4;
 
 typedef double ElementType;
 
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
     cuCtxCreate(&cuContext, 0, cuDevice);
 
     // cudaFree(nullptr);
-    const std::array<int64_t, 3> sizes3D = { domain_size + 2 * halo_width,
+    const std::array<int32_t, 3> sizes3D = { domain_size + 2 * halo_width,
                                              domain_size + 2 * halo_width,
                                              domain_height + 2 * halo_width };
 

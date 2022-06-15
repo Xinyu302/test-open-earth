@@ -70,16 +70,20 @@ int main(int argc, char **argv) {
     MemRefType3D out = allocateMemRef(sizes3D);
     fillMath(1.1, 2.0, 1.5, 2.8, 2.0, 4.1, in, domain_size, domain_height);
     initValue(out, 0.0, domain_size, domain_height);
-
+    for (int i = 0; i < domain_size; i++) 
+        for (int j = 0; j < domain_size; j++) 
+            for (int k = 0; k < domain_height; k++) {
+                std::cout << in(i,j,k) << std::endl;
+            }
     // computing the reference version
-     _mlir_ciface_laplace((MemRef3D *)&in.alignedPtr[in.offset], &out);
-     for(int i = 0; i < 100000; i++) {
-	std::cout << in.allocatedPtr[i] << std::endl;
-     }
+     _mlir_ciface_laplace(&in, &out);
+
      std::cout << "-----------\n";
-     for(int i = 0; i < 100000; i++) {
-	std::cout << out.allocatedPtr[i] << std::endl;
-     }
+     for (int i = 0; i < domain_size; i++) 
+        for (int j = 0; j < domain_size; j++) 
+            for (int k = 0; k < domain_height; k++) {
+                std::cout << out(i,j,k) << std::endl;
+            }
     // free the storage
     freeMemRef(in);
     freeMemRef(out);

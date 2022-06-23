@@ -4,7 +4,7 @@
 
 // define the domain size and the halo width
 int32_t domain_size = 64;
-int32_t domain_height = 60;
+int32_t domain_height = 64;
 int32_t halo_width = 4;
 
 typedef double ElementType;
@@ -14,7 +14,7 @@ typedef double ElementType;
 typedef MemRef1D MemRefType1D;
 typedef MemRef2D MemRefType2D;
 typedef MemRef3D MemRefType3D;
-
+#include "laplace.h"
 #define CUDA_CALL_SAFE(f) \
 	    do \
     {                                                        \
@@ -70,15 +70,18 @@ int main(int argc, char **argv) {
     MemRefType3D out = allocateMemRef(sizes3D);
     fillMath(1.1, 2.0, 1.5, 2.8, 2.0, 4.1, in, domain_size, domain_height);
     initValue(out, 0.0, domain_size, domain_height);
+    laplace(in ,out);
+    std::cout << "--------cpu--------\n";
     for (int i = 0; i < domain_size; i++) 
         for (int j = 0; j < domain_size; j++) 
             for (int k = 0; k < domain_height; k++) {
-                std::cout << in(i,j,k) << std::endl;
+                std::cout << out(i,j,k) << std::endl;
             }
     // computing the reference version
+     initValue(out, 0.0, domain_size, domain_height);
      _mlir_ciface_laplace(&in, &out);
 
-     std::cout << "-----------\n";
+     std::cout << "---------gpu------\n";
      for (int i = 0; i < domain_size; i++) 
         for (int j = 0; j < domain_size; j++) 
             for (int k = 0; k < domain_height; k++) {

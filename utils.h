@@ -179,7 +179,7 @@ bool check_difference(MemRef &ref1, MemRef &ref2) {
         if (ref1.allocatedPtr[i] != ref2.allocatedPtr[i] ) {
             std::cout << "value different at " << i << std::endl;
             std::cout << "value1 = " << ref1.allocatedPtr[i] << std::endl;
-            std::cout << "value2 = " << ref2.allocatedPtr[i] << std::endl
+            std::cout << "value2 = " << ref2.allocatedPtr[i] << std::endl;
             return false;
         }
     }

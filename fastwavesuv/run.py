@@ -20,13 +20,27 @@ def compile_mlir():
         --parallel-loop-tiling='parallel-loop-tile-sizes=128,1,1' \
         --canonicalize --test-gpu-greedy-parallel-loop-mapping \
         --convert-parallel-loops-to-gpu --canonicalize --lower-affine --convert-scf-to-std --stencil-kernel-to-cubin " + origin_mlir_path
-    subprocess.call(cmd1.split(), cwd=CWD, stdout=lowered_mlir_path)
+    with open(lowered_mlir_path, "w") as f:
+        ret = subprocess.call(cmd1.split(), cwd=CWD, stdout=f)
+    if ret != 0:
+        print("Error: compile_mlir failed in lowering")
+        exit(1)
     cmd2 = "mlir-translate --mlir-to-llvmir " + lowered_mlir_path
-    subprocess.call(cmd2.split(), cwd=CWD, stdout=bc_path)
+    with open(bc_path, "w") as f:
+        ret = subprocess.call(cmd2.split(), cwd=CWD, stdout=f)
+    if ret != 0:
+        print("Error: compile_mlir failed in translation")
+        exit(1)
     cmd3 = "llc -O3 " + bc_path + " -o " + assembly_path
-    subprocess.call(cmd3.split(), cwd=CWD)
+    ret = subprocess.call(cmd3.split(), cwd=CWD)
+    if ret != 0:
+        print("Error: compile_mlir failed in llc")
+        exit(1)
     cmd4 = "clang -c " + assembly_path + " -fPIE -o " + object_path
-    subprocess.call(cmd4.split(), cwd=CWD)
+    ret = subprocess.call(cmd4.split(), cwd=CWD)
+    if ret != 0:
+        print("Error: compile_mlir failed in clang")
+        exit(1)
 
 def clean():
     for file in [lowered_mlir_path, bc_path, assembly_path, object_path]:
@@ -37,8 +51,11 @@ def clean():
 def link():
     print("Linking...")
     cmd = "nvcc -ccbin clang {}.cpp ".format(BENCH_NAME) + object_path + " -L/root/new-open-earth/llvm-project/install/lib -lcuda-runtime-wrappers -lcudart -lcuda -o demo"
-    subprocess.call(cmd.split(), cwd=CWD)
-    
+    ret = subprocess.call(cmd.split(), cwd=CWD)
+    if ret != 0:
+        print("Error: link failed")
+        exit(1)
+
 def run():
     print("Running...")
     cmd = "./demo"

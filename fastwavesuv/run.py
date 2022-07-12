@@ -1,7 +1,9 @@
+from ast import arg
 import os
 import os.path
+from re import A
 import subprocess
-
+import argparse
 
 # CWD = os.path.realpath(os.path.dirname(__file__))
 CWD = os.path.dirname(os.path.realpath(__file__))
@@ -70,11 +72,18 @@ def run():
     if ret != 0:
         print("Error: run failed")
         exit(1)
-import argparse
-if __name__ == '__main__':
 
-    clean()
-    compile_mlir()
-    link()
-    run()
-    print("done!")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--clean', action='store_true')
+    parser.add_argument('--run', action='store_true')
+    args = parser.parse_args()
+
+    if args.clean:
+        clean()
+    if args.run:
+        clean()
+        compile_mlir()
+        link()
+        run()
+        print("done!")

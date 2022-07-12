@@ -2,7 +2,7 @@
 
 // define the domain size and the halo width
 int32_t domain_size = 64;
-int32_t domain_height = 60;
+int32_t domain_height = 64;
 int32_t halo_width = 4;
 
 typedef double ElementType;
@@ -10,7 +10,16 @@ typedef double ElementType;
 #include "util.h"
 
 extern "C" {
-  void _mlir_ciface_laplace(Storage3D *input, Storage3D *output);
+  void _mlir_ciface_fastwavesuv(Storage3D *, Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage1D *);
+}
+
+void printStorage(Storage3D &ref) {
+
+for (int i = 0; i < domain_size; i++) 
+      for (int j = 0; j < domain_size; j++) 
+          for (int k = 0; k < domain_height; k++) {
+              std::cout << ref(i,j,k) << std::endl;
+          }
 }
 
 // program times the execution of the linked program and times the result
@@ -62,7 +71,9 @@ int main(int argc, char **argv) {
 
   initValue(uout, 0.0, domain_size, domain_height);
   initValue(vout, 0.0, domain_size, domain_height);
-
+  std::cout << "init values" << std::endl;
+  printStorage(uout);
+  
   memH2D(uin);
   memH2D(utens);
   memH2D(vin);
@@ -75,7 +86,7 @@ int main(int argc, char **argv) {
   memH2D(vout);
   memH2D(fx);
 
-  fastwavesuv(uout, vout, uin, vin, utens, vtens, wgtfac, ppuv, hhl, rho, fx, ppgk, ppgc, ppgu, ppgv, edadlat, dt);
+  _mlir_ciface_fastwavesuv( &uin, &vin, &utens, &vtens, &wgtfac, &ppuv, &hhl, &rho,&uout, &vout, &fx);
 
   memD2H(uout);
   memD2H(vout);
@@ -90,18 +101,9 @@ int main(int argc, char **argv) {
   freeDeviceStorage(rho);
 
   freeDeviceStorage(fx);
-  for (int i = 0; i < domain_size; i++) 
-      for (int j = 0; j < domain_size; j++) 
-          for (int k = 0; k < domain_height; k++) {
-              std::cout << uout(i,j,k) << std::endl;
-          }
-
-  for (int i = 0; i < domain_size; i++) 
-    for (int j = 0; j < domain_size; j++) 
-        for (int k = 0; k < domain_height; k++) {
-            std::cout << vout(i,j,k) << std::endl;
-        }
-  // free the storage in host memory
+  std::cout << "after values" << std::endl;
+  printStorage(uout);
+    // free the storage in host memory
   freeStorage(uout);
   freeStorage(vout);
   // freeStorage(ppgk);

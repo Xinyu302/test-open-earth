@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <array>
+#include <cuda_runtime.h>
+#include <cuda.h>
 
 #define EARTH_RADIUS ((ElementType)6371.229e3) // radius of the earth
 #define EARTH_RADIUS_RECIP ((ElementType)1.0 / EARTH_RADIUS)
@@ -144,9 +146,9 @@ void freeDeviceStorage(Storage &ref) {
 template <typename Storage>
 void memH2D(Storage &ref) {
     ElementType* hostPtr = ref.allocatedPtr;
-    cudaMalloc(&ref.allocatedPtr, sizeof(hostPtr))
+    cudaMalloc(&ref.allocatedPtr, sizeof(hostPtr));
     ref.alignedPtr = &ref.allocatedPtr[(32 - halo_width)];
-    cudaMemcpy(ref.alignedPtr, hostPtr, sizeof(hostPtr), cudaMemcpyHostToDevice);
+    cudaMemcpy(ref.allocatedPtr, hostPtr, sizeof(hostPtr), cudaMemcpyHostToDevice);
     delete hostPtr;
 }
 
@@ -154,7 +156,7 @@ template <typename Storage>
 void memD2H(Storage &ref) {
     ElementType* devicePtr = ref.allocatedPtr;
     ElementType* hostPtr = new ElementType[sizeof(devicePtr)];
-    cudaMemcpy(returnPtr, ref.alignedPtr, sizeof(devicePtr), cudaMemcpyDeviceToHost);
+    cudaMemcpy(hostPtr, devicePtr, sizeof(devicePtr), cudaMemcpyDeviceToHost);
     cudaFree(devicePtr);
     ref.allocatedPtr = hostPtr;
     ref.alignedPtr = &ref.allocatedPtr[(32 - halo_width)];

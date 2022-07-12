@@ -41,6 +41,15 @@ struct Storage {
 
     template<typename... T>
     const ElementType &operator()(type<T...>, T... arg) const;
+
+    
+    int32_t getMemSize() const {
+        int32_t memSize = 1;
+        for (int32_t i = 0; i < Rank; i++) {
+            memSize += sizes[i] * memSize;
+        }
+        return (memSize + 32 - halo_width) * sizeof(ElementType);
+    }
 };
 
 typedef Storage<ElementType, 1> Storage1D;
@@ -146,17 +155,18 @@ void freeDeviceStorage(Storage &ref) {
 template <typename Storage>
 void memH2D(Storage &ref) {
     ElementType* hostPtr = ref.allocatedPtr;
-    cudaMalloc(&ref.allocatedPtr, sizeof(hostPtr));
+    std::cout << ref.getMemSize() << std::endl;
+    cudaMalloc(&ref.allocatedPtr, ref.getMemSize());
     ref.alignedPtr = &ref.allocatedPtr[(32 - halo_width)];
-    cudaMemcpy(ref.allocatedPtr, hostPtr, sizeof(hostPtr), cudaMemcpyHostToDevice);
+    cudaMemcpy(ref.allocatedPtr, hostPtr, ref.getMemSize(), cudaMemcpyHostToDevice);
     delete hostPtr;
 }
 
 template <typename Storage>
 void memD2H(Storage &ref) {
     ElementType* devicePtr = ref.allocatedPtr;
-    ElementType* hostPtr = new ElementType[sizeof(devicePtr)];
-    cudaMemcpy(hostPtr, devicePtr, sizeof(devicePtr), cudaMemcpyDeviceToHost);
+    ElementType* hostPtr = new ElementType[ref.getMemSize()];
+    cudaMemcpy(hostPtr, devicePtr, ref.getMemSize(), cudaMemcpyDeviceToHost);
     cudaFree(devicePtr);
     ref.allocatedPtr = hostPtr;
     ref.alignedPtr = &ref.allocatedPtr[(32 - halo_width)];

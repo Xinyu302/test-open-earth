@@ -20,8 +20,13 @@ def compile_mlir():
         --parallel-loop-tiling='parallel-loop-tile-sizes=128,1,1' \
         --canonicalize --test-gpu-greedy-parallel-loop-mapping \
         --convert-parallel-loops-to-gpu --canonicalize --lower-affine --convert-scf-to-std --stencil-kernel-to-cubin " + origin_mlir_path
+    cmd1_paras = "oec-opt --canonicalize --stencil-inlining --cse --canonicalize --stencil-shape-inference --stencil-storage-materialization --stencil-shape-inference --stencil-combine-to-ifelse --cse \
+        --canonicalize --convert-stencil-to-std --cse --parallel-loop-tiling='parallel-loop-tile-sizes=128,1,1' \
+        --canonicalize --test-gpu-greedy-parallel-loop-mapping --convert-parallel-loops-to-gpu --lower-affine \
+        --convert-scf-to-std --gpu-kernel-outlining --cse \
+        --canonicalize --stencil-kernel-to-cubin --cse --canonicalize --mlir-disable-threading" + origin_mlir_path
     with open(lowered_mlir_path, "w") as f:
-        ret = subprocess.call(cmd1.split(), cwd=CWD, stdout=f)
+        ret = subprocess.call(cmd1_paras.split(), cwd=CWD, stdout=f)
     if ret != 0:
         print("Error: compile_mlir failed in lowering")
         exit(1)

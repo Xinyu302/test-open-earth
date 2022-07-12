@@ -4,8 +4,7 @@
 
 #ifndef UTIL_H
 #define UTIL_H
-#include <cuda_runtime.h>
-#include <cuda.h>
+
 #include <iostream>
 #include <array>
 
@@ -87,9 +86,7 @@ Storage1D allocateStorage(const int32_t size) {
     result.strides[0] = 1;
     result.offset = halo_width * result.strides[0];
     const int32_t allocSize = size;
-    if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * (allocSize + (32 - halo_width))) != cudaSuccess) {
-        std::cout << "utils allocateStorage error" << std::endl;
-    }
+    result.allocatedPtr = new ElementType[allocSize + 32 - halo_width];
     result.alignedPtr = &result.allocatedPtr[(32 - halo_width)];
     return result;
 }
@@ -105,9 +102,7 @@ Storage2D allocateStorage(const std::array<int32_t, 2> sizes) {
     result.offset = halo_width * result.strides[0] +
                     halo_width * result.strides[1];
     const int32_t allocSize = sizes[0] * sizes[1];
-    if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * (allocSize + (32 - halo_width))) != cudaSuccess) {
-        std::cout << "utils allocateStorage error" << std::endl;
-    }
+    result.allocatedPtr = new ElementType[allocSize + 32 - halo_width];
     result.alignedPtr = &result.allocatedPtr[(32 - halo_width)];
     return result;
 }
@@ -126,9 +121,7 @@ Storage3D allocateStorage(const std::array<int32_t, 3> sizes) {
                     halo_width * result.strides[1] +
                     halo_width * result.strides[2];
     const int32_t allocSize = sizes[0] * sizes[1] * sizes[2];
-    if (cudaMallocManaged(&result.allocatedPtr,sizeof(ElementType) * (allocSize + (32 - halo_width))) != cudaSuccess) {
-        std::cout << "utils allocateStorage error" << std::endl;
-    }
+    result.allocatedPtr = new ElementType[allocSize + 32 - halo_width];
     // result.allocatedPtr = new ElementType[allocSize + (32 - halo_width)];
     result.alignedPtr = &result.allocatedPtr[(32 - halo_width)];
     return result;
@@ -136,9 +129,35 @@ Storage3D allocateStorage(const std::array<int32_t, 3> sizes) {
 
 template <typename Storage>
 void freeStorage(Storage &ref) {
+    delete ref.allocatedPtr;
+    ref.allocatedPtr = nullptr;
+    ref.alignedPtr = nullptr;
+}
+
+template <typename Storage>
+void freeDeviceStorage(Storage &ref) {
     cudaFree(ref.allocatedPtr);
     ref.allocatedPtr = nullptr;
     ref.alignedPtr = nullptr;
+}
+
+template <typename Storage>
+void memH2D(Storage &ref) {
+    ElementType* hostPtr = ref.allocatedPtr;
+    cudaMalloc(&ref.allocatedPtr, sizeof(hostPtr))
+    ref.alignedPtr = &ref.allocatedPtr[(32 - halo_width)];
+    cudaMemcpy(ref.alignedPtr, hostPtr, sizeof(hostPtr), cudaMemcpyHostToDevice);
+    delete hostPtr;
+}
+
+template <typename Storage>
+void memD2H(Storage &ref) {
+    ElementType* devicePtr = ref.allocatedPtr;
+    ElementType* hostPtr = new ElementType[sizeof(devicePtr)];
+    cudaMemcpy(returnPtr, ref.alignedPtr, sizeof(devicePtr), cudaMemcpyDeviceToHost);
+    cudaFree(devicePtr);
+    ref.allocatedPtr = hostPtr;
+    ref.alignedPtr = &ref.allocatedPtr[(32 - halo_width)];
 }
 
 void fillMath(ElementType a, ElementType b, ElementType c, ElementType d,

@@ -52,7 +52,7 @@ def compile():
     files = os.listdir(CWD)
     for fi in files:
         if fi.startswith(BENCH_NAME) and fi.endswith(".mlir") and fi.find("_lowered") == -1:
-            compile_mlir(fi)
+            compile_mlir(fi[:-5])
 
 def clean_single(bench_name):
     lowered_mlir_path = os.path.join(CWD, bench_name + "_lowered.mlir")
@@ -67,7 +67,7 @@ def clean():
     files = os.listdir(CWD)
     for fi in files:
         if fi.startswith(BENCH_NAME) and fi.endswith(".mlir") and fi.find("_lowered") == -1:
-            clean_single(fi)
+            clean_single(fi[:-5])
 
 
 def link():

@@ -11,7 +11,13 @@ typedef double ElementType;
 #include "util.h"
 
 extern "C" {
-  void _mlir_ciface_fastwavesuv(Storage3D *, Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage1D *);
+  void _mlir_ciface_fastwavesuv_split0(Storage3D *, Storage3D *,Storage3D *);
+  void _mlir_ciface_fastwavesuv_split1(Storage3D *, Storage3D *);
+  void _mlir_ciface_fastwavesuv_split2(Storage3D *, Storage3D *,Storage3D *,Storage3D *);
+  void _mlir_ciface_fastwavesuv_split3(Storage3D *, Storage3D *,Storage3D *,Storage3D *);
+  void _mlir_ciface_fastwavesuv_split4(Storage3D *, Storage3D *,Storage3D *,Storage3D *,Storage1D *,Storage3D *);
+  void _mlir_ciface_fastwavesuv_split5(Storage3D *, Storage3D *,Storage3D *,Storage3D *,Storage3D *);
+
 }
 
 void printStorage(Storage3D &ref) {
@@ -72,7 +78,9 @@ int main(int argc, char **argv) {
 
   initValue(uout, 0.0, domain_size, domain_height);
   initValue(vout, 0.0, domain_size, domain_height);
-
+  // std::cout << "init values" << std::endl;
+  // printStorage(uout);
+  
   memH2D(uin);
   memH2D(utens);
   memH2D(vin);
@@ -85,9 +93,37 @@ int main(int argc, char **argv) {
   memH2D(vout);
   memH2D(fx);
 
+  Storage3D temp1 = allocateStorage(sizes3D);
+  Storage3D temp2 = allocateStorage(sizes3D);
+  Storage3D temp3 = allocateStorage(sizes3D);
+  Storage3D temp4 = allocateStorage(sizes3D);
+  // Storage3D temp5 = allocateStorage(sizes3D);
+  // Storage3D temp6 = allocateStorage(sizes3D);
+
+  memH2D(temp1);
+  memH2D(temp2);
+  memH2D(temp3);
+  memH2D(temp4);
+  // memH2D(temp5);
+  // memH2D(temp6);
+
+  // chrono计时
   auto start = std::chrono::high_resolution_clock::now();
 
-  _mlir_ciface_fastwavesuv( &uin, &vin, &utens, &vtens, &wgtfac, &ppuv, &hhl, &rho,&uout, &vout, &fx);
+
+  // _mlir_ciface_fastwavesuv( &uin, &vin, &utens, &vtens, &wgtfac, &ppuv, &hhl, &rho,&uout, &vout, &fx);
+  // temp1 : %20
+  _mlir_ciface_fastwavesuv_split0(&wgtfac,&ppuv,&temp1);
+  // temp2 : %21
+  _mlir_ciface_fastwavesuv_split1(&temp1,&temp2);
+  // temp3 : %22
+  _mlir_ciface_fastwavesuv_split2(&ppuv, &temp2, &hhl, &temp3);
+   // temp4 : %23
+  _mlir_ciface_fastwavesuv_split3(&ppuv, &temp2, &hhl, &temp4);
+
+  _mlir_ciface_fastwavesuv_split4( &uin, &vin, &temp3,  &rho,&fx,&uout );
+
+  _mlir_ciface_fastwavesuv_split5( &utens, &vtens, &temp4, &rho,&vout );
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end-start;
@@ -112,8 +148,6 @@ int main(int argc, char **argv) {
   printStorage(uout);
   std::cout << "vout" << std::endl;
   printStorage(vout);
-
-
     // free the storage in host memory
   freeStorage(uout);
   freeStorage(vout);

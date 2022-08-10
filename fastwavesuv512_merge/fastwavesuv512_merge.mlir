@@ -1,27 +1,25 @@
-
-
 module {
   func @fastwavesuv(%arg0: !stencil.field<?x?x?xf64>, %arg1: !stencil.field<?x?x?xf64>, %arg2: !stencil.field<?x?x?xf64>, %arg3: !stencil.field<?x?x?xf64>, %arg4: !stencil.field<?x?x?xf64>, %arg5: !stencil.field<?x?x?xf64>, %arg6: !stencil.field<?x?x?xf64>, %arg7: !stencil.field<?x?x?xf64>, %arg8: !stencil.field<?x?x?xf64>, %arg9: !stencil.field<?x?x?xf64>, %arg10: !stencil.field<0x?x0xf64>) attributes {stencil.program} {
-    %0 = stencil.cast %arg0([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %1 = stencil.cast %arg1([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %2 = stencil.cast %arg2([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %3 = stencil.cast %arg3([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %4 = stencil.cast %arg4([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %5 = stencil.cast %arg5([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %6 = stencil.cast %arg6([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %7 = stencil.cast %arg7([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %8 = stencil.cast %arg8([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %9 = stencil.cast %arg9([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<72x72x72xf64>
-    %10 = stencil.cast %arg10([-4, -4, -4] : [68, 68, 68]) : (!stencil.field<0x?x0xf64>) -> !stencil.field<0x72x0xf64>
-    %11 = stencil.load %0 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %12 = stencil.load %1 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %13 = stencil.load %2 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %14 = stencil.load %3 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %15 = stencil.load %4 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %16 = stencil.load %5 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %17 = stencil.load %6 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %18 = stencil.load %7 : (!stencil.field<72x72x72xf64>) -> !stencil.temp<?x?x?xf64>
-    %19 = stencil.load %10 : (!stencil.field<0x72x0xf64>) -> !stencil.temp<0x?x0xf64>
+    %0 = stencil.cast %arg0([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %1 = stencil.cast %arg1([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %2 = stencil.cast %arg2([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %3 = stencil.cast %arg3([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %4 = stencil.cast %arg4([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %5 = stencil.cast %arg5([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %6 = stencil.cast %arg6([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %7 = stencil.cast %arg7([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %8 = stencil.cast %arg8([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %9 = stencil.cast %arg9([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<?x?x?xf64>) -> !stencil.field<512x512x512xf64>
+    %10 = stencil.cast %arg10([-4, -4, -4] : [508, 508, 508]) : (!stencil.field<0x?x0xf64>) -> !stencil.field<0x512x0xf64>
+    %11 = stencil.load %0 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %12 = stencil.load %1 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %13 = stencil.load %2 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %14 = stencil.load %3 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %15 = stencil.load %4 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %16 = stencil.load %5 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %17 = stencil.load %6 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %18 = stencil.load %7 : (!stencil.field<512x512x512xf64>) -> !stencil.temp<?x?x?xf64>
+    %19 = stencil.load %10 : (!stencil.field<0x512x0xf64>) -> !stencil.temp<0x?x0xf64>
     %20 = stencil.apply (%arg11 = %15 : !stencil.temp<?x?x?xf64>, %arg12 = %16 : !stencil.temp<?x?x?xf64>) -> !stencil.temp<?x?x?xf64> {
       %26 = stencil.access %arg11 [0, 0, 0] : (!stencil.temp<?x?x?xf64>) -> f64
       %27 = stencil.access %arg12 [0, 0, 0] : (!stencil.temp<?x?x?xf64>) -> f64
@@ -72,12 +70,12 @@ module {
       %45 = addf %28, %44 : f64
 
       // %37 = addf %33, %34 : f64
-      %68 = addf %65, %66 : f64
-      %69 = subf %37, %68 : f64
+      %508 = addf %65, %66 : f64
+      %69 = subf %37, %508 : f64
       
       %71 = subf %65, %66 : f64
-      %72 = addf %40, %71 : f64
-      %73 = divf %69, %72 : f64
+      %512 = addf %40, %71 : f64
+      %73 = divf %69, %512 : f64
       %74 = mulf %32, %73 : f64
       %75 = addf %58, %74 : f64
 
@@ -148,8 +146,8 @@ module {
       %38 = stencil.store_result %37 : (f64) -> !stencil.result<f64>
       stencil.return %38 : !stencil.result<f64>
     }
-    stencil.store %24 to %8([0, 0, 0] : [64, 64, 64]) : !stencil.temp<?x?x?xf64> to !stencil.field<72x72x72xf64>
-    stencil.store %25 to %9([0, 0, 0] : [64, 64, 64]) : !stencil.temp<?x?x?xf64> to !stencil.field<72x72x72xf64>
+    stencil.store %24 to %8([0, 0, 0] : [504, 504, 504]) : !stencil.temp<?x?x?xf64> to !stencil.field<512x512x512xf64>
+    stencil.store %25 to %9([0, 0, 0] : [504, 504, 504]) : !stencil.temp<?x?x?xf64> to !stencil.field<512x512x512xf64>
     return
   }
 }

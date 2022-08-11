@@ -8,8 +8,10 @@ origin_kernel_size = 72
 halo_width = 4
 
 if __name__ == '__main__':
-    print(sys.argv[1])
+    # print(sys.argv[1])
+    kernel_size = 512
     file_path = sys.argv[1]
+    kernel_size = int(sys.argv[2])
     assert os.path.exists(file_path)
     assert file_path.endswith(".mlir")
     # for file in os.listdir(CWD):

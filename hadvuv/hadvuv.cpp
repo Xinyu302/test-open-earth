@@ -1,4 +1,5 @@
 #include <cmath>
+#include <chrono>
 
 // define the domain size and the halo width
 int32_t domain_size = 64;

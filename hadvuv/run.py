@@ -90,11 +90,11 @@ if __name__ == '__main__':
         run()
         print("done!")
 
-    if arg.compile:
+    if args.compile:
         clean()
         compile_mlir()
         link()
         
-    if arg.exec:
+    if args.exec:
         run()
         print("done!")

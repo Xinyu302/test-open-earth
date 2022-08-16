@@ -2,8 +2,8 @@
 #include <chrono>
 
 // define the domain size and the halo width
-int32_t domain_size = 64;
-int32_t domain_height = 64;
+int32_t domain_size = 128-8;
+int32_t domain_height = 128-8;
 int32_t halo_width = 4;
 
 typedef double ElementType;

@@ -11,7 +11,7 @@ typedef double ElementType;
 #include "util.h"
 
 extern "C" {
-  void _mlir_ciface_hadvuv(Storage3D *, Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage3D *,Storage1D *);
+  void _mlir_ciface_hadvuv(Storage3D *, Storage3D *,Storage3D *,Storage3D *,Storage1D *,Storage1D *,Storage1D *,Storage1D *);
 }
 
 void printStorage(Storage3D &ref) {
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
   auto start = std::chrono::high_resolution_clock::now();
 
-  _mlir_ciface_hadvuv(uout, vout, uin, vin, acrlat0, acrlat1, tgrlatda0, tgrlatda1);
+  _mlir_ciface_hadvuv(&uin, &vin,&uout, &vout, &acrlat0, &acrlat1, &tgrlatda0, &tgrlatda1);
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end-start;

@@ -107,11 +107,11 @@ int main(int argc, char **argv) {
 
   freeDeviceStorage(fx);
   // std::cout << "after values" << std::endl;
-  // std::cout << "uout" << std::endl;
+  std::cout << "uout" << std::endl;
 
-  // printStorage(uout);
-  // std::cout << "vout" << std::endl;
-  // printStorage(vout);
+  printStorage(uout);
+  std::cout << "vout" << std::endl;
+  printStorage(vout);
 
 
     // free the storage in host memory
